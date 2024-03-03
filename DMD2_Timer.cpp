@@ -38,9 +38,9 @@
 // Assuming esp32 using frequency of 80MHz...
 #define ESP32_TIMER0 0
 // run counter to increment every 1 microseconds
-#define ESP32_TIMER0_PRESCALER 80
+#define ESP32_TIMER0_PRESCALER 160
 // call scan_running_dmds every 250 microseconds on ESP32
-#define ESP32_TIMER0_RELOAD_ON 250
+#define ESP32_TIMER0_RELOAD_ON 1000
 
 #ifdef NO_TIMERS
 
@@ -167,7 +167,8 @@ void BaseDMD::end()
 }
 
 #elif defined(ESP32)
-hw_timer_t *timer = NULL;
+
+static hw_timer_t *timer = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
 void IRAM_ATTR esp32_ISR_wrapper(){
@@ -184,16 +185,18 @@ void BaseDMD::begin()
 {
   beginNoTimer();
 
-  timer = timerBegin(ESP32_TIMER0, ESP32_TIMER0_PRESCALER, true);
-
   register_running_dmd(this);
 
-  timerAttachInterrupt(timer, &esp32_ISR_wrapper, true);
-  timerAlarmWrite(timer, ESP32_TIMER0_RELOAD_ON, true);
+  if (timer == NULL) {
+    timer = timerBegin(ESP32_TIMER0, ESP32_TIMER0_PRESCALER, true);
 
-  // safety net
-  yield();
-  timerAlarmEnable(timer);
+    timerAttachInterrupt(timer, &esp32_ISR_wrapper, true);
+    timerAlarmWrite(timer, ESP32_TIMER0_RELOAD_ON, true);
+
+    // safety net
+    yield();
+    timerAlarmEnable(timer);
+  }
 }
 
 void BaseDMD::end()

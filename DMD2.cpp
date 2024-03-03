@@ -48,7 +48,7 @@ void SPIDMD::beginNoTimer()
 #ifdef __AVR__
   SPI.setClockDivider(SPI_CLOCK_DIV4); // 4MHz clock. 8MHz (DIV2 not DIV4) is possible if you have short cables. Longer cables may need DIV8/DIV16.
 #elif defined(ESP8266) || defined(ESP32)
-  SPI.setFrequency(4000000); // ESP can run at 80mhz or 160mhz, setting frequency directly is easier, set to 4MHz.
+  SPI.setFrequency(8000000); // ESP can run at 80mhz or 160mhz, setting frequency directly is easier, set to 4MHz.
 #else
   SPI.setClockDivider(20); // 4.2MHz on Due. Same comment as above applies (lower numbers = less divider = faster speeds.)
 #endif

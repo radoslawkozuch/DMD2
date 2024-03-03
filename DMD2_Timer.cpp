@@ -37,10 +37,8 @@
 
 // Assuming esp32 using frequency of 80MHz...
 #define ESP32_TIMER0 0
-// run counter to increment every 1 microseconds
-#define ESP32_TIMER0_PRESCALER 160
-// call scan_running_dmds every 250 microseconds on ESP32
-#define ESP32_TIMER0_RELOAD_ON 1000
+// call scan_running_dmds every 500 microseconds on ESP32
+#define ESP32_TIMER0_RELOAD_ON 500
 
 #ifdef NO_TIMERS
 
@@ -188,7 +186,8 @@ void BaseDMD::begin()
   register_running_dmd(this);
 
   if (timer == NULL) {
-    timer = timerBegin(ESP32_TIMER0, ESP32_TIMER0_PRESCALER, true);
+    uint8_t cpuClock = ESP.getCpuFreqMHz();
+    timer = timerBegin(ESP32_TIMER0, cpuClock, true);
 
     timerAttachInterrupt(timer, &esp32_ISR_wrapper, true);
     timerAlarmWrite(timer, ESP32_TIMER0_RELOAD_ON, true);
